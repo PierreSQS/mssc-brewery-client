@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.net.URI;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,4 +26,19 @@ class BreweryClientTest {
 
         System.out.println(beerByID);
     }
+
+    @Test
+    void saveNewBeer() {
+        BeerDto newBeerDto = BeerDto.builder()
+                .id(UUID.randomUUID())
+                .beerName("33 Export")
+                .beerStyle("Pils")
+                .upc(123456789L)
+                .build();
+
+        URI uri = breweryClient.saveNewBeer(newBeerDto);
+        System.out.println(uri);
+        assertThat(uri.getPath())
+                .as("Check that Path is like \"%s\"", uri.getPath())
+                .contains("/api/v1/beer/");    }
 }
