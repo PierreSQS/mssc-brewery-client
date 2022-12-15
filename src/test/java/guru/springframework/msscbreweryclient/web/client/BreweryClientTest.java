@@ -1,6 +1,7 @@
 package guru.springframework.msscbreweryclient.web.client;
 
 import guru.springframework.msscbreweryclient.web.model.BeerDto;
+import guru.springframework.msscbreweryclient.web.model.CustomerDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ class BreweryClientTest {
 
     BeerDto beerDto;
 
+    CustomerDto customerDto;
+
     @Autowired
     BreweryClient breweryClient;
 
@@ -27,6 +30,11 @@ class BreweryClientTest {
                 .beerName("33 Export")
                 .beerStyle("Pils")
                 .upc(123456789L)
+                .build();
+
+        customerDto = CustomerDto.builder()
+                .id(UUID.randomUUID())
+                .name("Pierrot Tests")
                 .build();
 
     }
@@ -48,11 +56,41 @@ class BreweryClientTest {
         System.out.println(uri);
         assertThat(uri.getPath())
                 .as("Check that Path is like \"%s\"", uri.getPath())
-                .contains("/api/v1/beer/");    }
+                .contains("/api/v1/beer/");
+    }
 
     @Test
     void updateBeer() {
         BeerDto beerDtoToUpdate = beerDto;
         breweryClient.updateBeer(UUID.randomUUID(), beerDtoToUpdate);
+    }
+
+    @Test
+    void getCustomerByID() {
+        CustomerDto customerByID = breweryClient.getCustomerByID(UUID.randomUUID());
+        String customer = customerByID.getName();
+        assertThat(customer)
+                .as("Check that Customer Name is equal to \"%s\"", customer)
+                .isEqualTo("Joe Buck");
+    }
+
+    @Test
+    void saveCustomer() {
+        String regex = "[/api/v1/customer/]\\S+";
+        URI uri = breweryClient.saveCustomer(customerDto);
+        assertThat(uri.getPath())
+                .as("Check that Customer Name matches \"%s\"", BreweryClient.CUSTOMER_API_PATH_V1)
+                .matches(regex);
+        System.out.println(uri);
+    }
+
+    @Test
+    void updateCustomerByID() {
+        breweryClient.updateCustomer(UUID.randomUUID(),customerDto);
+    }
+
+    @Test
+    void deleteCustomerByID() {
+        breweryClient.deleteCustomer(UUID.randomUUID());
     }
 }
