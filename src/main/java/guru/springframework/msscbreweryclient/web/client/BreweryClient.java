@@ -10,14 +10,15 @@ import java.net.URI;
 import java.util.UUID;
 
 /**
- * Created by jt on 2019-04-23.
+ * Created by Pierrot on 2022-09-18.
  */
 @ConfigurationProperties(prefix = "sfg.brewery", ignoreUnknownFields = false)
 @Component
 public class BreweryClient {
 
-    public final String BEER_PATH_V1 = "/api/v1/beer/";
-    private String apihost;
+    public static final String BEER_API_PATH_V1 = "/api/v1/beer/";
+
+    private String apiHost;
 
     private final RestTemplate restTemplate;
 
@@ -25,23 +26,20 @@ public class BreweryClient {
         this.restTemplate = restTemplateBuilder.build();
     }
 
-    public BeerDto getBeerById(UUID uuid){
-        return restTemplate.getForObject(apihost + BEER_PATH_V1 + uuid.toString(), BeerDto.class);
+    public BeerDto getBeerByID(UUID uuid) {
+        String apiUrl = apiHost+BEER_API_PATH_V1+uuid.toString();
+        return restTemplate.getForObject(apiUrl,BeerDto.class);
     }
 
     public URI saveNewBeer(BeerDto beerDto){
-        return restTemplate.postForLocation(apihost + BEER_PATH_V1, beerDto);
+        return restTemplate.postForLocation(apiHost+BEER_API_PATH_V1,beerDto);
     }
 
-    public void updateBeer(UUID uuid, BeerDto beerDto){
-        restTemplate.put(apihost + BEER_PATH_V1 + "/" + uuid.toString(), beerDto);
+    public void updateBeer(UUID beerUid, BeerDto beerDto) {
+        restTemplate.put(apiHost+BEER_API_PATH_V1+beerUid.toString(), beerDto);
     }
 
-    public void deleteBeer(UUID uuid){
-        restTemplate.delete(apihost + BEER_PATH_V1 + "/" + uuid );
-    }
-
-    public void setApihost(String apihost) {
-        this.apihost = apihost;
+    public void setApiHost(String apiHost) {
+        this.apiHost = apiHost;
     }
 }
